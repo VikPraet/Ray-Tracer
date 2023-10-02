@@ -31,22 +31,20 @@ namespace dae {
 		//todo W1
 
 		// spheres
-		const  std::vector<dae::Sphere>& spheresVec = GetSphereGeometries();
-		for (int idx{}; idx < spheresVec.size(); ++idx)
+		for (int idx{}; idx < m_SphereGeometries.size(); ++idx)
 		{
 			HitRecord tempHit{};
-			if (GeometryUtils::HitTest_Sphere(spheresVec[idx], ray, tempHit) && tempHit.t < closestHit.t)
+			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[idx], ray, tempHit) && tempHit.t < closestHit.t)
 			{
 				closestHit = tempHit;
 			}
 		}
 
 		// planes
-		const std::vector<dae::Plane>& planeVec = GetPlaneGeometries();
-		for (int idx{}; idx < planeVec.size(); ++idx)
+		for (int idx{}; idx < m_PlaneGeometries.size(); ++idx)
 		{
 			HitRecord tempHit{};
-			if (GeometryUtils::HitTest_Plane(planeVec[idx], ray, tempHit) && tempHit.t < closestHit.t)
+			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[idx], ray, tempHit) && tempHit.t < closestHit.t)
 			{
 				closestHit = tempHit;
 			}
@@ -56,20 +54,20 @@ namespace dae {
 	bool Scene::DoesHit(const Ray& ray) const
 	{
 		//todo W3
-		const  std::vector<dae::Sphere>& spheresVec = GetSphereGeometries();
-		for (int idx{}; idx < spheresVec.size(); ++idx)
+
+		// spheres
+		for (int idx{}; idx < m_SphereGeometries.size(); ++idx)
 		{
-			if (GeometryUtils::HitTest_Sphere(spheresVec[idx], ray))
+			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[idx], ray))
 			{
 				return true;
 			}
 		}
 
 		// planes
-		const std::vector<dae::Plane>& planeVec = GetPlaneGeometries();
-		for (int idx{}; idx < planeVec.size(); ++idx)
+		for (int idx{}; idx < m_PlaneGeometries.size(); ++idx)
 		{
-			if (GeometryUtils::HitTest_Plane(planeVec[idx], ray))
+			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[idx], ray))
 			{
 				return true;
 			}
