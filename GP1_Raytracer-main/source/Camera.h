@@ -42,7 +42,12 @@ namespace dae
 			
 			up = Vector3::Cross(forward, right);
 			up.Normalize();
-			return { right, up, forward, origin };
+			return{
+				{ right.x	, right.y	, right.z	, 0},
+				{ up.x		, up.y		, up.z		, 0},
+				{ forward.x	, forward.y	, forward.z	, 0},
+				{ origin.x	, origin.y	, origin.z	, 0}
+			};
 		}
 
 		void Update(Timer* pTimer)
@@ -52,7 +57,7 @@ namespace dae
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
-			const float SPEED{10};
+			const float SPEED{7};
 			if (pKeyboardState[SDL_SCANCODE_W])
 			{
 				origin.x += forward.x *  SPEED * deltaTime;
@@ -72,6 +77,14 @@ namespace dae
 			{
 				origin.x += right.x * SPEED * deltaTime;
 				origin.z += right.z * SPEED * deltaTime;
+			}
+			if (pKeyboardState[SDL_SCANCODE_Q])
+			{
+				origin.y += up.y * SPEED * deltaTime;
+			}
+			if (pKeyboardState[SDL_SCANCODE_E])
+			{
+				origin.y -= up.y * SPEED * deltaTime;
 			}
 
 
@@ -94,16 +107,18 @@ namespace dae
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 			
-			const float SENSITIVITY{ 0.007f };
-			totalPitch += mouseX * SENSITIVITY;
-			totalYaw -= mouseY * SENSITIVITY;
-			Matrix final{ Matrix::CreateRotationX(totalYaw) * Matrix::CreateRotationY(totalPitch) };
+			if (mouseState == SDL_BUTTON_LMASK)
+			{
+				const float SENSITIVITY{ 0.007f };
+				totalPitch += mouseX * SENSITIVITY;
+				totalYaw -= mouseY * SENSITIVITY;
+				Matrix final{ Matrix::CreateRotationX(totalYaw) * Matrix::CreateRotationY(totalPitch) };
 
-			forward = final.TransformVector(Vector3::UnitZ);
-			forward.Normalize();
+				forward = final.TransformVector(Vector3::UnitZ);
+				forward.Normalize();
+			}
 
 			//todo: W2
-			//assert(false && "Not Implemented Yet");
 		}
 	};
 }
