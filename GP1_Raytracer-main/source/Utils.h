@@ -106,8 +106,22 @@ namespace dae
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
 		{
 			//todo W3
-			assert(false && "No Implemented Yet!");
-			return { };
+			float radiance{0.0f};
+			float distance{ Vector3{light.origin - target }.Magnitude() };
+			
+			if (distance >= 0.0f)
+			{
+				if (light.type == LightType::Point)
+				{
+					radiance = light.intensity / (4.0f * M_PI * distance * distance);
+				}
+				else
+				{
+
+				}
+			}
+
+			return { radiance, radiance, radiance };
 		}
 	}
 

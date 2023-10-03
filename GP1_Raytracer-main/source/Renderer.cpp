@@ -48,7 +48,24 @@ void Renderer::Render(Scene* pScene) const
 
 			if (closestHit.didHit)
 			{
-				//finalColor = materials[closestHit.materialIndex]->Shade();
+				switch (m_CurrentLightingMode)
+				{
+				case dae::Renderer::LightingMode::ObservedArea:
+					finalColor = { 1.f,1.f ,1.f };
+					break;
+
+				case dae::Renderer::LightingMode::Radiance:
+					finalColor = materials[closestHit.materialIndex]->Shade();
+					break;
+
+				case dae::Renderer::LightingMode::BDRF:
+					break;
+
+				case dae::Renderer::LightingMode::Combined:
+					break;
+
+				}
+				float averageRadiance{ };
 
 				for (int i{}; i < pScene->GetLights().size(); ++i)
 				{
@@ -56,22 +73,23 @@ void Renderer::Render(Scene* pScene) const
 					Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
 					lightRayDirection.max = LightVector.Magnitude();
 					
-					switch (m_CurrentLigningMode)
+					switch (m_CurrentLightingMode)
 					{
 					case dae::Renderer::LightingMode::ObservedArea:
 						{
-							finalColor = { 1.f, 1.f, 1.f };
-							float observeAreaMeasure{ Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized()) };
-							if (observeAreaMeasure > 0)
+							float averageObserveAreaMeasure{ Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized()) };
+
+							if (averageObserveAreaMeasure > 0)
 							{
-								finalColor *= observeAreaMeasure;
+								finalColor *= averageObserveAreaMeasure;
 							}
 						}
 						break;
 
 					case dae::Renderer::LightingMode::Radiance:
 						{
-							 
+
+							averageRadiance += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin).r;
 						}
 						break;
 
@@ -94,6 +112,11 @@ void Renderer::Render(Scene* pScene) const
 					{
 						finalColor *= 0.5f;
 					}
+				}
+				if (averageRadiance != 0)
+				{
+					averageRadiance /= pScene->GetLights().size();
+					finalColor *= averageRadiance;
 				}
 			}
 
@@ -119,9 +142,9 @@ bool Renderer::SaveBufferToImage() const
 
 void dae::Renderer::CycleLigntingMode()
 {
-	m_CurrentLigningMode = static_cast<LightingMode>(int(m_CurrentLigningMode) + 1);
-	if (int(m_CurrentLigningMode) > 3)
-		m_CurrentLigningMode = LightingMode::ObservedArea;
+	m_CurrentLightingMode = static_cast<LightingMode>(int(m_CurrentLightingMode) + 1);
+	if (int(m_CurrentLightingMode) > 3)
+		m_CurrentLightingMode = LightingMode::ObservedArea;
 }
 
 void dae::Renderer::ToggleShadows()

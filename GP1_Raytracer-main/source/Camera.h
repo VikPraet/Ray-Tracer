@@ -107,7 +107,7 @@ namespace dae
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 			
-			if (mouseState == SDL_BUTTON_LMASK)
+			if (mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
 			{
 				const float SENSITIVITY{ 0.007f };
 				totalPitch += mouseX * SENSITIVITY;
