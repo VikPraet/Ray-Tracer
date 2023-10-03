@@ -43,7 +43,7 @@ namespace dae
 			Combined
 		};
 
-		LightingMode m_CurrentLigningMode{ LightingMode::Combined };
+		LightingMode m_CurrentLigningMode{ LightingMode::ObservedArea };
 		bool m_ShadowsEnabled{ true };
 	};
 }

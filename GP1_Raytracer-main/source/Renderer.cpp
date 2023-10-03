@@ -12,7 +12,7 @@
 
 using namespace dae;
 
-Renderer::Renderer(SDL_Window * pWindow) :
+Renderer::Renderer(SDL_Window* pWindow) :
 	m_pWindow(pWindow),
 	m_pBuffer(SDL_GetWindowSurface(pWindow))
 {
@@ -40,7 +40,7 @@ void Renderer::Render(Scene* pScene) const
 			rayDirection.Normalize();
 			rayDirection = camera.CalculateCameraToWorld().TransformVector(rayDirection);
 			Ray hitray{ camera.origin, rayDirection };
-			
+
 			ColorRGB finalColor{};
 
 			HitRecord closestHit{};
@@ -48,18 +48,51 @@ void Renderer::Render(Scene* pScene) const
 
 			if (closestHit.didHit)
 			{
-				finalColor = materials[closestHit.materialIndex]->Shade();
-				if (m_ShadowsEnabled)
+				//finalColor = materials[closestHit.materialIndex]->Shade();
+
+				for (int i{}; i < pScene->GetLights().size(); ++i)
 				{
-					for (int i{}; i < pScene->GetLights().size(); ++i)
+					Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
+					Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
+					lightRayDirection.max = LightVector.Magnitude();
+					
+					switch (m_CurrentLigningMode)
 					{
-						Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
-						Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
-						lightRayDirection.max = LightVector.Magnitude();
-						if (pScene->DoesHit(lightRayDirection))
+					case dae::Renderer::LightingMode::ObservedArea:
 						{
-							finalColor *= 0.5f;
+							finalColor = { 1.f, 1.f, 1.f };
+							float observeAreaMeasure{ Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized()) };
+							if (observeAreaMeasure > 0)
+							{
+								finalColor *= observeAreaMeasure;
+							}
 						}
+						break;
+
+					case dae::Renderer::LightingMode::Radiance:
+						{
+							 
+						}
+						break;
+
+					case dae::Renderer::LightingMode::BDRF:
+						{
+
+						}
+						break;
+
+					case dae::Renderer::LightingMode::Combined:
+						{
+
+						}
+						break;
+
+					default:
+						break;
+					}
+					if (pScene->DoesHit(lightRayDirection) && m_ShadowsEnabled)
+					{
+						finalColor *= 0.5f;
 					}
 				}
 			}
