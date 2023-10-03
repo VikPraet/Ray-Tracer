@@ -203,7 +203,7 @@ namespace dae {
 	{
 		sceneName = "Week 3";
 		m_Camera.origin = { 0,3,-9 };
-		m_Camera.fovAngle = 45.f;
+		//m_Camera.fovAngle = 45.f;
 
 		const auto matCT_GrayRoughMetal = AddMaterial(new Material_CookTorrence({ .972f, .960f, .915f }, 1.f, 1.f));
 		const auto matCT_GrayMediumMetal = AddMaterial(new Material_CookTorrence({ .972f, .960f, .915f }, 1.f, .6f));
@@ -240,7 +240,7 @@ namespace dae {
 
 		AddPointLight(Vector3{ 2.5F, 5.f, 8.f }, 200, ColorRGB{ 1.f, .61f, .45f }); //Backlight
 		AddPointLight(Vector3{ -2.5f, 5.f, -5.f }, 200, ColorRGB{ 1.f, .8f, .45f }); //Front Light Left
-		AddPointLight(Vector3{ 2.5f, 2.5f, -5.f }, 200, ColorRGB{ .34f, .47f, .68f });
+		AddPointLight(Vector3{ 0.f, 4.f, -5.f }, 200, ColorRGB{ .34f, .47f, .68f });
 	}
 #pragma endregion
 }

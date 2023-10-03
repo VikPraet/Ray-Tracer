@@ -66,7 +66,7 @@ void Renderer::Render(Scene* pScene) const
 
 				}
 				float averageRadiance{ };
-
+				float averageObserveAreaMeasure{ };
 				for (int i{}; i < pScene->GetLights().size(); ++i)
 				{
 					Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
@@ -77,11 +77,11 @@ void Renderer::Render(Scene* pScene) const
 					{
 					case dae::Renderer::LightingMode::ObservedArea:
 						{
-							float averageObserveAreaMeasure{ Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized()) };
+							float temp{ Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized())};
 
-							if (averageObserveAreaMeasure > 0)
+							if (temp > 0)
 							{
-								finalColor *= averageObserveAreaMeasure;
+								averageObserveAreaMeasure += temp;
 							}
 						}
 						break;
@@ -113,11 +113,26 @@ void Renderer::Render(Scene* pScene) const
 						finalColor *= 0.5f;
 					}
 				}
-				if (averageRadiance != 0)
+				switch (m_CurrentLightingMode)
 				{
-					averageRadiance /= pScene->GetLights().size();
-					finalColor *= averageRadiance;
+				case dae::Renderer::LightingMode::ObservedArea:
+						averageObserveAreaMeasure /= pScene->GetLights().size();
+						finalColor *= averageObserveAreaMeasure;
+								break;
+
+				case dae::Renderer::LightingMode::Radiance:
+						averageRadiance /= pScene->GetLights().size();
+						finalColor *= averageRadiance;
+					break;
+
+				case dae::Renderer::LightingMode::BDRF:
+					break;
+
+				case dae::Renderer::LightingMode::Combined:
+					break;
+
 				}
+				
 			}
 
 			//Update Color in Buffer
