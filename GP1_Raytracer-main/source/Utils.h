@@ -117,11 +117,11 @@ namespace dae
 				}
 				else
 				{
-
+					// directional light code
 				}
 			}
 
-			return { radiance, radiance, radiance };
+			return { radiance * light.color.r, radiance * light.color.g, radiance * light.color.b };
 		}
 	}
 

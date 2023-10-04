@@ -31,9 +31,10 @@ void Renderer::Render(Scene* pScene) const
 
 	for (int px{}; px < m_Width; ++px)
 	{
+		float x = (2.f * ((static_cast<float>(px) + 0.5f) / static_cast<float>(m_Width)) - 1.f) * aspectRatio * camera.fovValue;
+
 		for (int py{}; py < m_Height; ++py)
 		{
-			float x = (2.f * ((static_cast<float>(px) + 0.5f) / static_cast<float>(m_Width)) - 1.f) * aspectRatio * camera.fovValue;
 			float y = (1.f - 2.f * ((static_cast<float>(py) + 0.5f) / static_cast<float>(m_Height))) * camera.fovValue;
 			Vector3 rayDirection{ x, y, 1 };
 
@@ -48,91 +49,38 @@ void Renderer::Render(Scene* pScene) const
 
 			if (closestHit.didHit)
 			{
+				finalColor = materials[closestHit.materialIndex]->Shade();
+
 				switch (m_CurrentLightingMode)
 				{
 				case dae::Renderer::LightingMode::ObservedArea:
-					finalColor = { 1.f,1.f ,1.f };
-					break;
+				{
+					CalculateObservedArea(pScene, closestHit, finalColor);
+				}
+				break;
 
 				case dae::Renderer::LightingMode::Radiance:
-					finalColor = materials[closestHit.materialIndex]->Shade();
-					break;
+				{
+					CalculateRadiance(pScene, closestHit, finalColor);
+				}
+				break;
 
 				case dae::Renderer::LightingMode::BDRF:
-					break;
+				{
+
+				}
+				break;
 
 				case dae::Renderer::LightingMode::Combined:
-					break;
-
-				}
-				float averageRadiance{ };
-				float averageObserveAreaMeasure{ };
-				for (int i{}; i < pScene->GetLights().size(); ++i)
 				{
-					Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
-					Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
-					lightRayDirection.max = LightVector.Magnitude();
-					
-					switch (m_CurrentLightingMode)
-					{
-					case dae::Renderer::LightingMode::ObservedArea:
-						{
-							float temp{ Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized())};
-
-							if (temp > 0)
-							{
-								averageObserveAreaMeasure += temp;
-							}
-						}
-						break;
-
-					case dae::Renderer::LightingMode::Radiance:
-						{
-
-							averageRadiance += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin).r;
-						}
-						break;
-
-					case dae::Renderer::LightingMode::BDRF:
-						{
-
-						}
-						break;
-
-					case dae::Renderer::LightingMode::Combined:
-						{
-
-						}
-						break;
-
-					default:
-						break;
-					}
-					if (pScene->DoesHit(lightRayDirection) && m_ShadowsEnabled)
-					{
-						finalColor *= 0.5f;
-					}
-				}
-				switch (m_CurrentLightingMode)
-				{
-				case dae::Renderer::LightingMode::ObservedArea:
-						averageObserveAreaMeasure /= pScene->GetLights().size();
-						finalColor *= averageObserveAreaMeasure;
-								break;
-
-				case dae::Renderer::LightingMode::Radiance:
-						averageRadiance /= pScene->GetLights().size();
-						finalColor *= averageRadiance;
-					break;
-
-				case dae::Renderer::LightingMode::BDRF:
-					break;
-
-				case dae::Renderer::LightingMode::Combined:
-					break;
 
 				}
-				
+				break;
+
+				default:
+					break;
+				}
+				CalculateShadows(pScene, closestHit, finalColor);
 			}
 
 			//Update Color in Buffer
@@ -144,7 +92,6 @@ void Renderer::Render(Scene* pScene) const
 				static_cast<uint8_t>(finalColor.b * 255));
 		}
 	}
-
 	//@END
 	//Update SDL Surface
 	SDL_UpdateWindowSurface(m_pWindow);
@@ -165,4 +112,58 @@ void dae::Renderer::CycleLigntingMode()
 void dae::Renderer::ToggleShadows()
 {
 	m_ShadowsEnabled = !m_ShadowsEnabled;
+}
+
+void dae::Renderer::CalculateObservedArea(const Scene* pScene, const HitRecord& closestHit, ColorRGB& finalColor) const
+{
+	finalColor = { 1.f,1.f ,1.f };
+
+	float averageObserveAreaMeasure{ };
+	for (int i{}; i < pScene->GetLights().size(); ++i)
+	{
+		Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
+		Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
+		lightRayDirection.max = LightVector.Magnitude();
+
+		float temp{ Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized()) };
+		if (temp > 0)
+		{
+			averageObserveAreaMeasure += temp;
+		}
+	}
+
+	averageObserveAreaMeasure /= pScene->GetLights().size();
+	finalColor *= averageObserveAreaMeasure;
+}
+
+void dae::Renderer::CalculateRadiance(const Scene* pScene, const HitRecord& closestHit, ColorRGB& finalColor) const
+{
+	ColorRGB averageRadiance{ 0.f, 0.f, 0.f };
+
+	for (int i{}; i < pScene->GetLights().size(); ++i)
+	{
+		Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
+		Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
+		lightRayDirection.max = LightVector.Magnitude();
+
+		averageRadiance += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin);
+	}
+
+	averageRadiance /= pScene->GetLights().size();
+	finalColor *= averageRadiance;
+}
+
+void dae::Renderer::CalculateShadows(const Scene* pScene, const HitRecord& closestHit, ColorRGB& finalColor) const
+{
+	for (int i{}; i < pScene->GetLights().size(); ++i)
+	{
+		Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
+		Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
+		lightRayDirection.max = LightVector.Magnitude();
+
+		if (pScene->DoesHit(lightRayDirection) && m_ShadowsEnabled)
+		{
+			finalColor *= 0.5f;
+		}
+	}
 }

@@ -236,8 +236,6 @@ namespace dae {
 		AddSphere(Vector3{ 0.f, 3.f, 0.f }, .75f, matId_Solid_Yellow);
 		AddSphere(Vector3{ 1.75f, 3.f, 0.f }, .75f, matId_Solid_Magenta);
 
-
-
 		AddPointLight(Vector3{ 2.5F, 5.f, 8.f }, 200, ColorRGB{ 1.f, .61f, .45f }); //Backlight
 		AddPointLight(Vector3{ -2.5f, 5.f, -5.f }, 200, ColorRGB{ 1.f, .8f, .45f }); //Front Light Left
 		AddPointLight(Vector3{ 0.f, 4.f, -5.f }, 200, ColorRGB{ .34f, .47f, .68f });

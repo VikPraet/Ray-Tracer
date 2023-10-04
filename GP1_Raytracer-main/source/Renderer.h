@@ -1,9 +1,11 @@
 #pragma once
 
 #include <cstdint>
+#include "DataTypes.h"
 
 struct SDL_Window;
 struct SDL_Surface;
+struct ColorRGB;
 
 namespace dae
 {
@@ -45,5 +47,9 @@ namespace dae
 
 		LightingMode m_CurrentLightingMode{ LightingMode::ObservedArea };
 		bool m_ShadowsEnabled{ true };
+
+		void CalculateObservedArea(const Scene* pScene, const HitRecord& closestHit, ColorRGB& finalColor) const;
+		void CalculateRadiance(const Scene* pScene, const HitRecord& closestHit, ColorRGB& finalColor) const;
+		void CalculateShadows(const Scene* pScene, const HitRecord& closestHit, ColorRGB& finalColor) const;
 	};
 }
