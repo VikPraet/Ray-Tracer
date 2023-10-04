@@ -29,6 +29,9 @@ void Renderer::Render(Scene* pScene) const
 
 	float aspectRatio{ float(m_Width) / float(m_Height) };
 
+	ColorRGB finalColor{};
+	Matrix camMatrix{ camera.CalculateCameraToWorld() };
+
 	for (int px{}; px < m_Width; ++px)
 	{
 		float x = (2.f * ((static_cast<float>(px) + 0.5f) / static_cast<float>(m_Width)) - 1.f) * aspectRatio * camera.fovValue;
@@ -37,12 +40,11 @@ void Renderer::Render(Scene* pScene) const
 		{
 			float y = (1.f - 2.f * ((static_cast<float>(py) + 0.5f) / static_cast<float>(m_Height))) * camera.fovValue;
 			Vector3 rayDirection{ x, y, 1 };
+			rayDirection = camMatrix.TransformVector(rayDirection);
 
 			rayDirection.Normalize();
-			rayDirection = camera.CalculateCameraToWorld().TransformVector(rayDirection);
 			Ray hitray{ camera.origin, rayDirection };
 
-			ColorRGB finalColor{};
 
 			HitRecord closestHit{};
 			pScene->GetClosestHit(hitray, closestHit);
