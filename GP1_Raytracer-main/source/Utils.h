@@ -50,6 +50,7 @@ namespace dae
 			{
 				hitRecord.t = t;
 				hitRecord.origin = ray.origin + ray.direction * hitRecord.t;
+				hitRecord.normal = plane.normal;
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = plane.materialIndex;
 				return true;

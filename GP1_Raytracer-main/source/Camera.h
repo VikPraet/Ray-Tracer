@@ -22,8 +22,8 @@ namespace dae
 
 
 		Vector3 origin{};
-		float fovAngle{75.f};
-		float fovValue{tanf(fovAngle * (M_PI/180.f) / 2.f) };
+		float fovAngle{45.f};
+		float fovValue{tanf(fovAngle * TO_RADIANS / 2.f) };
 
 		Vector3 forward{ Vector3::UnitZ };
 		Vector3 up{Vector3::UnitY};
@@ -95,12 +95,12 @@ namespace dae
 			if (pKeyboardState[SDL_SCANCODE_RIGHT] && fovAngle < MAX_FOV)
 			{
 				fovAngle += FOV_INCREMENT * deltaTime;
-				fovValue = tanf(fovAngle * (M_PI / 180.f) / 2.f);
+				fovValue = tanf(fovAngle * TO_RADIANS / 2.f);
 			}
 			if (pKeyboardState[SDL_SCANCODE_LEFT] && fovAngle > MIN_FOV)
 			{
 				fovAngle -= FOV_INCREMENT * deltaTime;
-				fovValue = tanf(fovAngle * (M_PI / 180.f) / 2.f);
+				fovValue = tanf(fovAngle * TO_RADIANS / 2.f);
 			}
 
 			//Mouse Input
