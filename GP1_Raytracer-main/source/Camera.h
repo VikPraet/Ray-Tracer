@@ -92,12 +92,12 @@ namespace dae
 			const int MAX_FOV			{ 179 };
 			const int MIN_FOV			{ 10 };
 
-			if (pKeyboardState[SDL_SCANCODE_RIGHT] && fovAngle < MAX_FOV)
+			if (pKeyboardState[SDL_SCANCODE_DOWN] && fovAngle < MAX_FOV)
 			{
 				fovAngle += FOV_INCREMENT * deltaTime;
 				fovValue = tanf(fovAngle * TO_RADIANS / 2.f);
 			}
-			if (pKeyboardState[SDL_SCANCODE_LEFT] && fovAngle > MIN_FOV)
+			if (pKeyboardState[SDL_SCANCODE_UP] && fovAngle > MIN_FOV)
 			{
 				fovAngle -= FOV_INCREMENT * deltaTime;
 				fovValue = tanf(fovAngle * TO_RADIANS / 2.f);
@@ -106,8 +106,8 @@ namespace dae
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
-			
-			if (mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
+
+			if (mouseState & SDL_BUTTON_RMASK)
 			{
 				const float SENSITIVITY{ 0.007f };
 				totalPitch += mouseX * SENSITIVITY;
@@ -117,8 +117,6 @@ namespace dae
 				forward = final.TransformVector(Vector3::UnitZ);
 				forward.Normalize();
 			}
-
-			//todo: W2
 		}
 	};
 }

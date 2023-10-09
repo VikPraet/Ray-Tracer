@@ -44,6 +44,8 @@ void Renderer::Render(Scene* pScene) const
 			rayDirection.Normalize();
 			Ray hitray{ camera.origin, rayDirection };
 
+			Vector3 v{ hitray.direction.Normalized() * -1.0f };
+
 			HitRecord closestHit{};
 			pScene->GetClosestHit(hitray, closestHit);
 
@@ -60,7 +62,7 @@ void Renderer::Render(Scene* pScene) const
 					// skip light calculation when light does not hit pixel
 					if (pScene->DoesHit(lightRayDirection) && m_ShadowsEnabled) continue;
 
-					//finalColor = materials[closestHit.materialIndex]->Shade();
+					Vector3 l = (pScene->GetLights()[i].origin - closestHit.origin).Normalized();
 					float cosineLaw{ std::max(0.f, Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized())) };
 
 					switch (m_CurrentLightingMode)
@@ -79,13 +81,13 @@ void Renderer::Render(Scene* pScene) const
 
 					case dae::Renderer::LightingMode::BDRF:
 					{
-
+						finalColor += materials[closestHit.materialIndex]->Shade(closestHit, l, v);
 					}
 					break;
 
 					case dae::Renderer::LightingMode::Combined:
 					{
-						finalColor += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin) * cosineLaw;
+						finalColor += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, l, v) * cosineLaw;
 					}
 					break;
 					}
