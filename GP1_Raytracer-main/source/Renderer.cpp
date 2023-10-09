@@ -57,6 +57,7 @@ void Renderer::Render(Scene* pScene) const
 					Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
 					lightRayDirection.max = LightVector.Magnitude();
 
+					// skip light calculation when light does not hit pixel
 					if (pScene->DoesHit(lightRayDirection) && m_ShadowsEnabled) continue;
 
 					//finalColor = materials[closestHit.materialIndex]->Shade();
@@ -84,12 +85,9 @@ void Renderer::Render(Scene* pScene) const
 
 					case dae::Renderer::LightingMode::Combined:
 					{
-
+						finalColor += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin) * cosineLaw;
 					}
 					break;
-
-					default:
-						break;
 					}
 				}
 			}
