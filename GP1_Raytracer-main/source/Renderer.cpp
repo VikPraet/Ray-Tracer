@@ -56,13 +56,14 @@ void Renderer::Render(Scene* pScene) const
 				for (int i{}; i < pScene->GetLights().size(); ++i)
 				{
 					Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
-					Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, LightVector.Normalized() };
+					Vector3 l = LightVector.Normalized();
+
+					Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, l };
 					lightRayDirection.max = LightVector.Magnitude();
 
 					// skip light calculation when light does not hit pixel
 					if (pScene->DoesHit(lightRayDirection) && m_ShadowsEnabled) continue;
 
-					Vector3 l = (pScene->GetLights()[i].origin - closestHit.origin).Normalized();
 					float cosineLaw{ std::max(0.f, Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized())) };
 
 					switch (m_CurrentLightingMode)

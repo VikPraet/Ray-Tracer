@@ -48,6 +48,7 @@ namespace dae
 		std::vector<Plane> m_PlaneGeometries{};
 		std::vector<Sphere> m_SphereGeometries{};
 		std::vector<TriangleMesh> m_TriangleMeshGeometries{};
+		std::vector<Triangle> m_Triangles{};
 		std::vector<Light> m_Lights{};
 		std::vector<Material*> m_Materials{};
 
@@ -95,7 +96,7 @@ namespace dae
 	};
 
 	//+++++++++++++++++++++++++++++++++++++++++
-//WEEK 3 Test Scene
+	//WEEK 3 Test Scene
 	class Scene_W3 final : public Scene
 	{
 	public:
@@ -106,6 +107,22 @@ namespace dae
 		Scene_W3(Scene_W1&&) noexcept = delete;
 		Scene_W3& operator=(const Scene_W1&) = delete;
 		Scene_W3& operator=(Scene_W1&&) noexcept = delete;
+
+		void Initialize() override;
+	};
+
+	//+++++++++++++++++++++++++++++++++++++++++
+	//WEEK 4 Test Scene
+	class Scene_W4 final : public Scene
+	{
+	public:
+		Scene_W4() = default;
+		~Scene_W4() override = default;
+
+		Scene_W4(const Scene_W1&) = delete;
+		Scene_W4(Scene_W1&&) noexcept = delete;
+		Scene_W4& operator=(const Scene_W1&) = delete;
+		Scene_W4& operator=(Scene_W1&&) noexcept = delete;
 
 		void Initialize() override;
 	};
