@@ -44,7 +44,7 @@ void Renderer::Render(Scene* pScene) const
 			rayDirection.Normalize();
 			Ray hitray{ camera.origin, rayDirection };
 
-			Vector3 v{ hitray.direction.Normalized() * -1.0f };
+			Vector3 v{ hitray.direction * -1 };
 
 			HitRecord closestHit{};
 			pScene->GetClosestHit(hitray, closestHit);
@@ -55,16 +55,15 @@ void Renderer::Render(Scene* pScene) const
 			{
 				for (int i{}; i < pScene->GetLights().size(); ++i)
 				{
-					Vector3 LightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
-					Vector3 l = LightVector.Normalized();
+					Vector3 toLightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
+					Vector3 l = toLightVector.Normalized();
 
-					Ray lightRayDirection{ closestHit.origin + closestHit.normal * 0.001f, l };
-					lightRayDirection.max = LightVector.Magnitude();
+					Ray toLightRay{ closestHit.origin + closestHit.normal * 0.001f, l, 0.0f, toLightVector.Magnitude() };
 
 					// skip light calculation when light does not hit pixel
-					if (pScene->DoesHit(lightRayDirection) && m_ShadowsEnabled) continue;
+					if (pScene->DoesHit(toLightRay) && m_ShadowsEnabled) continue;
 
-					float cosineLaw{ std::max(0.f, Vector3::Dot(closestHit.normal, lightRayDirection.direction.Normalized())) };
+					float cosineLaw{ std::max(0.f, Vector3::Dot(closestHit.normal, toLightRay.direction)) };
 
 					switch (m_CurrentLightingMode)
 					{

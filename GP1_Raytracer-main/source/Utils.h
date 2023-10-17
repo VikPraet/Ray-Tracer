@@ -78,6 +78,18 @@ namespace dae
 
 			if (dae::AreEqual(Vector3::Dot(n, ray.direction), 0)) return false;
 
+			switch (triangle.cullMode)
+			{
+			case TriangleCullMode::FrontFaceCulling:
+				if (Vector3::Dot(n, ray.direction) < 0) return false;
+				break;
+
+			case TriangleCullMode::BackFaceCulling:
+				if (Vector3::Dot(n, ray.direction) > 0) return false;
+				break;
+			}
+
+
 			float t{ Vector3::Dot((triangle.v0 - ray.origin), n) / (Vector3::Dot(ray.direction, n)) };
 			if (t < ray.min || t > ray.max) return false;
 
