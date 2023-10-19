@@ -52,7 +52,9 @@ namespace dae
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
 			//todo: W3
-			return f0 + (ColorRGB(1.f, 1.f, 1.f) - f0) * powf(1.0f - std::max(0.0f, Vector3::Dot(h, v)), 5);
+			float dot{ 1.0f - std::max(0.0f, Vector3::Dot(h, v)) };
+
+			return f0 + (ColorRGB(1.f, 1.f, 1.f) - f0) * (dot * dot * dot * dot * dot);
 		}
 
 		/**

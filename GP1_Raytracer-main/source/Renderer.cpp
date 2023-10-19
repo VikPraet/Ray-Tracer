@@ -44,26 +44,28 @@ void Renderer::Render(Scene* pScene) const
 			rayDirection.Normalize();
 			Ray hitray{ camera.origin, rayDirection };
 
-			Vector3 v{ hitray.direction * -1 };
+			Vector3 v{ hitray.direction * -1};
 
 			HitRecord closestHit{};
 			pScene->GetClosestHit(hitray, closestHit);
 
 			ColorRGB finalColor{};
 
+			const Vector3 hitPlusOffset{ closestHit.origin + closestHit.normal * 0.001f };
+
 			if (closestHit.didHit)
 			{
 				for (int i{}; i < pScene->GetLights().size(); ++i)
 				{
-					Vector3 toLightVector{ LightUtils::GetDirectionToLight(pScene->GetLights()[i], closestHit.origin) };
-					Vector3 l = toLightVector.Normalized();
+					Vector3 toHitVector{ hitPlusOffset - lights[i].origin };
+					Vector3 l{ toHitVector.Normalized() };
 
-					Ray toLightRay{ closestHit.origin + closestHit.normal * 0.001f, l, 0.0f, toLightVector.Magnitude() };
+					Ray toLightRay{ lights[i].origin, l, 0.0f, toHitVector.Magnitude() };
 
 					// skip light calculation when light does not hit pixel
 					if (pScene->DoesHit(toLightRay) && m_ShadowsEnabled) continue;
 
-					float cosineLaw{ std::max(0.f, Vector3::Dot(closestHit.normal, toLightRay.direction)) };
+					float cosineLaw{ std::max(0.f, Vector3::Dot(closestHit.normal, -toLightRay.direction)) };
 
 					switch (m_CurrentLightingMode)
 					{
@@ -81,13 +83,13 @@ void Renderer::Render(Scene* pScene) const
 
 					case dae::Renderer::LightingMode::BDRF:
 					{
-						finalColor += materials[closestHit.materialIndex]->Shade(closestHit, l, v);
+						finalColor += materials[closestHit.materialIndex]->Shade(closestHit, -l, v);
 					}
 					break;
 
 					case dae::Renderer::LightingMode::Combined:
 					{
-						finalColor += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, l, v) * cosineLaw;
+						finalColor += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, -l, v) * cosineLaw;
 					}
 					break;
 					}
