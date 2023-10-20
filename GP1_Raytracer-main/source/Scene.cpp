@@ -50,11 +50,11 @@ namespace dae {
 			}
 		}
 
-		// triangles
-		for (int idx{}; idx < m_Triangles.size(); ++idx)
+		// triangleMeshes
+		for (int idx{}; idx < m_TriangleMeshGeometries.size(); ++idx)
 		{
 			HitRecord tempHit{};
-			if (GeometryUtils::HitTest_Triangle(m_Triangles[idx], ray, tempHit) && tempHit.t < closestHit.t)
+			if (GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[idx], ray, tempHit) && tempHit.t < closestHit.t)
 			{
 				closestHit = tempHit;
 			}
@@ -83,10 +83,10 @@ namespace dae {
 			}
 		}
 
-		// triangles
-		for (int idx{}; idx < m_Triangles.size(); ++idx)
+		// triangleMeshes
+		for (int idx{}; idx < m_TriangleMeshGeometries.size(); ++idx)
 		{
-			if (GeometryUtils::HitTest_Triangle(m_Triangles[idx], ray))
+			if (GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[idx], ray))
 			{
 				return true;
 			}
@@ -281,32 +281,32 @@ namespace dae {
 		AddPlane(Vector3{ 5.f, 0.f, 0.f }, Vector3{ -1.f, 0.f, 0.f }, matLambert_GrayBlue); //RIGHT
 		AddPlane(Vector3{ -5.f, 0.f, 0.f }, Vector3{ 1.f, 0.f, 0.f }, matLambert_GrayBlue); //LEFT
 
-		//Triangle (Temp)
-		//===============
-		auto triangle = Triangle{ {-.75f,.5f,.0f},{-.75f,2.f, .0f}, {.75f,.5f,0.f} };
-		triangle.cullMode = TriangleCullMode::BackFaceCulling;
-		triangle.materialIndex = matLambert_White;
+		////Triangle (Temp)
+		////===============
+		//auto triangle = Triangle{ {-.75f,.5f,.0f},{-.75f,2.f, .0f}, {.75f,.5f,0.f} };
+		//triangle.cullMode = TriangleCullMode::BackFaceCulling;
+		//triangle.materialIndex = matLambert_White;
 
-		m_Triangles.emplace_back(triangle);
+		//m_Triangles.emplace_back(triangle);
 
 		//Triangle Mesh
 		//=============
-		//pMesh = AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
-		//pMesh->positions = {
-		//	{-.75f,-1.f,.0f},  //V0
-		//	{-.75f,1.f, .0f},  //V2
-		//	{.75f,1.f,1.f},    //V3
-		//	{.75f,-1.f,0.f} }; //V4
+		AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
+		m_TriangleMeshGeometries[0].positions = {
+			{-.75f,-1.f,.0f},  //V0
+			{-.75f,1.f, .0f},  //V2
+			{.75f,1.f,1.f},    //V3
+			{.75f,-1.f,0.f} }; //V4
 
-		//pMesh->indices = {
-		//	0,1,2, //Triangle 1
-		//	0,2,3  //Triangle 2
-		//};
+		m_TriangleMeshGeometries[0].indices = {
+			0,1,2, //Triangle 1
+			0,2,3  //Triangle 2
+		};
 
-		//pMesh->CalculateNormals();
+		m_TriangleMeshGeometries[0].CalculateNormals();
 
-		//pMesh->Translate({ 0.f,1.5f,0.f });
-		//pMesh->UpdateTransforms();
+		m_TriangleMeshGeometries[0].Translate({ 0.f,1.5f,0.f });
+		m_TriangleMeshGeometries[0].UpdateTransforms();
 
 		////OBJ
 		////===

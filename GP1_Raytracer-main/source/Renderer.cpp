@@ -110,6 +110,8 @@ void Renderer::Render(Scene* pScene) const
 	SDL_UpdateWindowSurface(m_pWindow);
 }
 
+
+
 bool Renderer::SaveBufferToImage() const
 {
 	return SDL_SaveBMP(m_pBuffer, "RayTracing_Buffer.bmp");
