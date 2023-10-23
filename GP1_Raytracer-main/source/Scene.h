@@ -112,18 +112,36 @@ namespace dae
 	};
 
 	//+++++++++++++++++++++++++++++++++++++++++
-	//WEEK 4 Test Scene
-	class Scene_W4 final : public Scene
+	//WEEK 4 reference Scene
+	class Scene_W4_ReferenceScene final : public Scene
 	{
 	public:
-		Scene_W4() = default;
-		~Scene_W4() override = default;
+		Scene_W4_ReferenceScene() = default;
+		~Scene_W4_ReferenceScene() override = default;
 
-		Scene_W4(const Scene_W1&) = delete;
-		Scene_W4(Scene_W1&&) noexcept = delete;
-		Scene_W4& operator=(const Scene_W1&) = delete;
-		Scene_W4& operator=(Scene_W1&&) noexcept = delete;
+		Scene_W4_ReferenceScene(const Scene_W1&) = delete;
+		Scene_W4_ReferenceScene(Scene_W1&&) noexcept = delete;
+		Scene_W4_ReferenceScene& operator=(const Scene_W1&) = delete;
+		Scene_W4_ReferenceScene& operator=(Scene_W1&&) noexcept = delete;
 
 		void Initialize() override;
+		void Update(Timer* pTimer) override;
+	};
+
+	//+++++++++++++++++++++++++++++++++++++++++
+//WEEK 4 Test Scene
+	class Scene_W4_TestScene final : public Scene
+	{
+	public:
+		Scene_W4_TestScene() = default;
+		~Scene_W4_TestScene() override = default;
+
+		Scene_W4_TestScene(const Scene_W1&) = delete;
+		Scene_W4_TestScene(Scene_W1&&) noexcept = delete;
+		Scene_W4_TestScene& operator=(const Scene_W1&) = delete;
+		Scene_W4_TestScene& operator=(Scene_W1&&) noexcept = delete;
+
+		void Initialize() override;
+		void Update(Timer* pTimer) override;
 	};
 }

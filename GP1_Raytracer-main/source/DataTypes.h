@@ -145,7 +145,7 @@ namespace dae
 		void UpdateTransforms()
 		{
 			// Calculate the final transformation matrix
-			Matrix finalTransform = scaleTransform * rotationTransform * translationTransform;
+			Matrix finalTransform = rotationTransform * scaleTransform * translationTransform;
 
 			// Clear any existing transformed positions and normals
 			transformedPositions.clear();
