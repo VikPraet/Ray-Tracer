@@ -37,6 +37,8 @@ namespace dae
 		int m_Width{};
 		int m_Height{};
 
+		std::vector<uint16_t> m_XVals;
+
 		enum class LightingMode
 		{
 			ObservedArea,

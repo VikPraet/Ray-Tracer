@@ -135,103 +135,36 @@ namespace dae
 #pragma region TriangeMesh HitTest
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			////todo W5
-			//for (int i{}; i < mesh.indices.size(); i += 3)
-			//{
-			//	int idx0 = mesh.indices[i];
-			//	int idx1 = mesh.indices[i + 1];
-			//	int idx2 = mesh.indices[i + 2];
+			//todo W5
+			bool hitSomething{ false };
+			HitRecord tempHit{};
+			hitRecord.t = FLT_MAX;
 
-			//	Triangle triangle{};
-			//	triangle.v0 = mesh.transformedPositions[idx0];
-			//	triangle.v1 = mesh.transformedPositions[idx1];
-			//	triangle.v2 = mesh.transformedPositions[idx2];
-
-			//	triangle.cullMode = mesh.cullMode;
-			//	triangle.materialIndex = mesh.materialIndex;
-			//	triangle.normal = mesh.transformedNormals[i / 3];
-
-			//	if (HitTest_Triangle(triangle, ray, hitRecord, ignoreHitRecord))
-			//	{
-			//		return true;
-			//	}
-			//}
-			//return false;
-
-			bool hitAnything = false;
-			float closestHitDistance = FLT_MAX;
-
-			for (size_t i = 0; i < mesh.indices.size(); i += 3)
+			for (int i{}; i < mesh.indices.size(); i += 3)
 			{
-				const int i0 = mesh.indices[i];
-				const int i1 = mesh.indices[i + 1];
-				const int i2 = mesh.indices[i + 2];
+				int idx0 = mesh.indices[i];
+				int idx1 = mesh.indices[i + 1];
+				int idx2 = mesh.indices[i + 2];
 
-				const Vector3& v0 = mesh.transformedPositions[i0];
-				const Vector3& v1 = mesh.transformedPositions[i1];
-				const Vector3& v2 = mesh.transformedPositions[i2];
+				Triangle triangle{};
+				triangle.v0 = mesh.transformedPositions[idx0];
+				triangle.v1 = mesh.transformedPositions[idx1];
+				triangle.v2 = mesh.transformedPositions[idx2];
 
-				const Vector3 edge1 = v1 - v0;
-				const Vector3 edge2 = v2 - v0;
+				triangle.cullMode = mesh.cullMode;
+				triangle.materialIndex = mesh.materialIndex;
+				triangle.normal = mesh.transformedNormals[i / 3];
 
-				const Vector3 h = Vector3::Cross(ray.direction, edge2);
-				const float a = Vector3::Dot(edge1, h);
-
-				// Handle culling
-				if (mesh.cullMode == TriangleCullMode::BackFaceCulling)
+				if (HitTest_Triangle(triangle, ray, tempHit, ignoreHitRecord))
 				{
-					if (a < -0)
-						continue;
-				}
-				else if (mesh.cullMode == TriangleCullMode::FrontFaceCulling)
-				{
-					if (a > -0)
-						continue;
-				}
-
-
-				// Check if inside of triangle
-				const float f = 1.0f / a;
-				const Vector3 s = ray.origin - v0;
-				const float u = f * Vector3::Dot(s, h);
-
-				// Check for u inside triangle
-				if (u < 0.0f || u > 1.0f)
-					continue;
-
-				const Vector3 q = Vector3::Cross(s, edge1);
-				const float v = f * Vector3::Dot(ray.direction, q);
-
-				// Check for v inside triangle
-				if (v < 0.0f || u + v > 1.0f)
-					continue;
-
-
-				// Get distance
-				const float distance = f * Vector3::Dot(edge2, q);
-
-				// If hit is in ray bounds
-				if (distance > ray.max || distance < ray.min)
-					continue;
-
-				// Check if this is the closes hit
-				if (distance < closestHitDistance)
-				{
-					closestHitDistance = distance;
-					hitAnything = true;
-
-					if (!ignoreHitRecord)
+					hitSomething = true;
+					if (tempHit.t < hitRecord.t)
 					{
-						hitRecord.t = distance;
-						hitRecord.origin = ray.origin + ray.direction * distance;
-						hitRecord.normal = Vector3::Cross(edge1, edge2).Normalized();
-						hitRecord.didHit = true;
-						hitRecord.materialIndex = mesh.materialIndex;
+						hitRecord = tempHit;
 					}
 				}
 			}
-
-			return hitAnything;
+			return hitSomething;
 		}
 
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray)

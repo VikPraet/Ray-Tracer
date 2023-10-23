@@ -10,8 +10,10 @@
 #include "Scene.h"
 #include "Utils.h"
 
-#include <thread>
-#include <vector>
+#include <algorithm>
+#include <execution>
+
+#define MULTI
 
 using namespace dae;
 
@@ -22,6 +24,11 @@ Renderer::Renderer(SDL_Window* pWindow) :
 	//Initialize
 	SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
 	m_pBufferPixels = static_cast<uint32_t*>(m_pBuffer->pixels);
+
+
+	m_XVals.reserve(m_Width);
+	for (uint16_t y{}; y < m_Height; ++y)
+		m_XVals.push_back(y);
 }
 
 void Renderer::Render(Scene* pScene) const
@@ -112,109 +119,6 @@ void Renderer::Render(Scene* pScene) const
 	//Update SDL Surface
 	SDL_UpdateWindowSurface(m_pWindow);
 }
-
-//void Renderer::Render(Scene* pScene) const
-//{
-//	Camera& camera = pScene->GetCamera();
-//	auto& materials = pScene->GetMaterials();
-//	auto& lights = pScene->GetLights();
-//
-//	float aspectRatio{ float(m_Width) / float(m_Height) };
-//
-//	Matrix camMatrix{ camera.CalculateCameraToWorld() };
-//
-//	// Define the number of threads to use
-//	const int numThreads = std::thread::hardware_concurrency();
-//
-//	// Vector to store thread objects
-//	std::vector<std::thread> threads;
-//
-//	// Function to be executed by each thread
-//	auto renderThreadFunc = [this, pScene, numThreads, aspectRatio, camera, camMatrix, lights, materials](int threadIndex)
-//		{
-//			for (int px = threadIndex; px < m_Width; px += numThreads)
-//			{
-//				float x = (2.f * ((static_cast<float>(px) + 0.5f) / static_cast<float>(m_Width)) - 1.f) * aspectRatio * camera.fovValue;
-//
-//				for (int py = 0; py < m_Height; ++py)
-//				{
-//					float y = (1.f - 2.f * ((static_cast<float>(py) + 0.5f) / static_cast<float>(m_Height))) * camera.fovValue;
-//					Vector3 rayDirection{ x, y, 1 };
-//					rayDirection = camMatrix.TransformVector(rayDirection);
-//
-//					rayDirection.Normalize();
-//					Ray hitray{ camera.origin, rayDirection };
-//
-//					Vector3 v{ hitray.direction * -1 };
-//
-//					HitRecord closestHit{};
-//					pScene->GetClosestHit(hitray, closestHit);
-//
-//					ColorRGB finalColor{};
-//
-//					const Vector3 hitPlusOffset{ closestHit.origin + closestHit.normal * 0.001f };
-//
-//					if (closestHit.didHit)
-//					{
-//						for (int i{}; i < pScene->GetLights().size(); ++i)
-//						{
-//							Vector3 toHitVector{ hitPlusOffset - lights[i].origin };
-//							Vector3 l{ toHitVector.Normalized() };
-//
-//							Ray toLightRay{ lights[i].origin, l, 0.0f, toHitVector.Magnitude() };
-//
-//							// skip light calculation when light does not hit pixel
-//							if (pScene->DoesHit(toLightRay) && m_ShadowsEnabled) continue;
-//
-//							float cosineLaw{ std::max(0.f, Vector3::Dot(closestHit.normal, -toLightRay.direction)) };
-//
-//							switch (m_CurrentLightingMode)
-//							{
-//							case dae::Renderer::LightingMode::ObservedArea:
-//							{
-//								finalColor += ColorRGB{ 1.f, 1.f, 1.f } *cosineLaw;
-//							}
-//							break;
-//
-//							case dae::Renderer::LightingMode::Radiance:
-//							{
-//								finalColor += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin);
-//							}
-//							break;
-//
-//							case dae::Renderer::LightingMode::BDRF:
-//							{
-//								finalColor += materials[closestHit.materialIndex]->Shade(closestHit, -l, v);
-//							}
-//							break;
-//
-//							case dae::Renderer::LightingMode::Combined:
-//							{
-//								finalColor += LightUtils::GetRadiance(pScene->GetLights()[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, -l, v) * cosineLaw;
-//							}
-//							break;
-//							}
-//						}
-//					}
-//				}
-//			}
-//		};
-//
-//	// Create and launch threads
-//	for (int i = 0; i < numThreads; ++i)
-//	{
-//		threads.emplace_back(renderThreadFunc, i);
-//	}
-//
-//	// Wait for all threads to finish
-//	for (auto& thread : threads)
-//	{
-//		thread.join();
-//	}
-//
-//	// Update SDL Surface
-//	SDL_UpdateWindowSurface(m_pWindow);
-//}
 
 bool Renderer::SaveBufferToImage() const
 {
