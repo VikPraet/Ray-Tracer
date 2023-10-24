@@ -81,7 +81,9 @@ namespace dae
 			Vector3 a{ triangle.v1 - triangle.v0 };
 			Vector3 b{ triangle.v2 - triangle.v0 };
 
-			if (dae::AreEqual(Vector3::Dot(triangle.normal, ray.direction), 0)) return false;
+			float Dot{ Vector3::Dot(triangle.normal, ray.direction) };
+
+			if (Dot < FLT_EPSILON && Dot > -FLT_EPSILON) return false;
 
 			switch (triangle.cullMode)
 			{

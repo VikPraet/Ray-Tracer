@@ -346,7 +346,7 @@ namespace dae {
 			m_TriangleMeshGeometries[idx].UpdateTransforms();
 		}
 	}
-#pragma endregion
+
 	void Scene_W4_TestScene::Initialize()
 	{
 		m_Camera.origin = { 0,3,-9 };
@@ -396,4 +396,5 @@ namespace dae {
 			m_TriangleMeshGeometries[idx].UpdateTransforms();
 		}
 	}
+#pragma endregion
 }
