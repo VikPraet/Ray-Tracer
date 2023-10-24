@@ -73,7 +73,7 @@ void Renderer::Render(Scene* pScene) const
 					Ray toLightRay{ lights[i].origin, l, 0.0f, toHitVector.Magnitude() };
 
 					// skip light calculation when light does not hit pixel
-					if (pScene->DoesHit(toLightRay) && m_ShadowsEnabled) continue;
+					if (m_ShadowsEnabled && pScene->DoesHit(toLightRay)) continue;
 
 					float cosineLaw{ std::max(0.f, Vector3::Dot(closestHit.normal, -toLightRay.direction)) };
 
