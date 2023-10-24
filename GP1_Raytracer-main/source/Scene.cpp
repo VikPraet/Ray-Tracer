@@ -319,16 +319,19 @@ namespace dae {
 		AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
 		m_TriangleMeshGeometries[0].AppendTriangle(baseTriangle, true);
 		m_TriangleMeshGeometries[0].Translate({ -1.75f,4.5f,0.f });
+		m_TriangleMeshGeometries[0].UpdateAABB();
 		m_TriangleMeshGeometries[0].UpdateTransforms();
 
 		AddTriangleMesh(TriangleCullMode::FrontFaceCulling, matLambert_White);
 		m_TriangleMeshGeometries[1].AppendTriangle(baseTriangle, true);
 		m_TriangleMeshGeometries[1].Translate({ 0.f,4.5f,0.f });
+		m_TriangleMeshGeometries[1].UpdateAABB();
 		m_TriangleMeshGeometries[1].UpdateTransforms();
 
 		AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
 		m_TriangleMeshGeometries[2].AppendTriangle(baseTriangle, true);
 		m_TriangleMeshGeometries[2].Translate({ 1.75f,4.5f,0.f });
+		m_TriangleMeshGeometries[2].UpdateAABB();
 		m_TriangleMeshGeometries[2].UpdateTransforms();
 
 		AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, ColorRGB{ 1.f, .61f, .45f }); //Backlight
@@ -370,15 +373,15 @@ namespace dae {
 
 		AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
 
-		Utils::ParseOBJ("Resources/simple_cube.obj",
+		Utils::ParseOBJ("Resources/lowpoly_bunny2.obj",
 			m_TriangleMeshGeometries[0].positions,
 			m_TriangleMeshGeometries[0].normals,
 			m_TriangleMeshGeometries[0].indices
 		);
 
 
-		m_TriangleMeshGeometries[0].Translate({ 0.f, 2.f, 0.f });
-		m_TriangleMeshGeometries[0].Scale({ 1.f, 1.f, 1.f });
+		m_TriangleMeshGeometries[0].Translate({ 0.f, 0.f, 0.f });
+		m_TriangleMeshGeometries[0].Scale({ 2.f, 2.f, 2.f });
 
 		m_TriangleMeshGeometries[0].UpdateAABB();
 		m_TriangleMeshGeometries[0].UpdateTransforms();
@@ -391,11 +394,10 @@ namespace dae {
 	{
 		Scene::Update(pTimer);
 
-		const float rotationAngle{ cos(pTimer->GetTotal() + 1) / 2.f * (PI/2) };
+		const float rotationAngle{ cos(pTimer->GetTotal() + 1) / 2.f * PI_2 };
 		for (int idx{}; idx < m_TriangleMeshGeometries.size(); ++idx)
 		{
-			m_TriangleMeshGeometries[idx].Rotate(rotationAngle, rotationAngle, 0);
-			m_TriangleMeshGeometries[idx].UpdateAABB();
+			m_TriangleMeshGeometries[idx].Rotate(0, rotationAngle, 0);
 			m_TriangleMeshGeometries[idx].UpdateTransforms();
 		}
 	}
