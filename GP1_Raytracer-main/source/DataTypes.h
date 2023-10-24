@@ -97,6 +97,21 @@ namespace dae
 			rotationTransform = Matrix::CreateRotationY(yaw);
 		}
 
+		void RotateX(float pitch)
+		{
+			rotationTransform = Matrix::CreateRotationX(pitch);
+		}
+
+		void RotateZ(float roll)
+		{
+			rotationTransform = Matrix::CreateRotationZ(roll);
+		}
+
+		void Rotate(float pitch, float yaw, float roll)
+		{
+			rotationTransform = Matrix::CreateRotation(pitch, yaw, roll);
+		}
+
 		void Scale(const Vector3& scale)
 		{
 			scaleTransform = Matrix::CreateScale(scale);

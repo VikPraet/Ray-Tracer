@@ -370,14 +370,14 @@ namespace dae {
 
 		AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
 
-		Utils::ParseOBJ("Resources/lowpoly_bunny2.obj",
+		Utils::ParseOBJ("Resources/simple_cube.obj",
 			m_TriangleMeshGeometries[0].positions,
 			m_TriangleMeshGeometries[0].normals,
 			m_TriangleMeshGeometries[0].indices
 		);
 
-		m_TriangleMeshGeometries[0].Translate({ 0.f, 0.f, 0.f });
-		m_TriangleMeshGeometries[0].Scale({ 2.f, 2.f, 2.f });
+		m_TriangleMeshGeometries[0].Translate({ 0.f, 2.f, 0.f });
+		m_TriangleMeshGeometries[0].Scale({ 1.f, 1.f, 1.f });
 
 		m_TriangleMeshGeometries[0].UpdateTransforms();
 
@@ -389,10 +389,10 @@ namespace dae {
 	{
 		Scene::Update(pTimer);
 
-		const float yawAngle{ cos(pTimer->GetTotal() + 1) / 2.f * PI_2 };
+		const float roatationAngle{ cos(pTimer->GetTotal() + 1) / 2.f * PI_2 };
 		for (int idx{}; idx < m_TriangleMeshGeometries.size(); ++idx)
 		{
-			m_TriangleMeshGeometries[idx].RotateY(yawAngle);
+			m_TriangleMeshGeometries[idx].Rotate(roatationAngle, roatationAngle, 0);
 			m_TriangleMeshGeometries[idx].UpdateTransforms();
 		}
 	}
