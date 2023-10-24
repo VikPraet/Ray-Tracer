@@ -137,54 +137,47 @@ namespace dae
 
 			normals.push_back(triangle.normal);
 
-			//Not ideal, but making sure all vertices are updated
-			if(!ignoreTransformUpdate)
-				UpdateTransforms();
+			if(!ignoreTransformUpdate) UpdateTransforms();
 		}
 
 		void CalculateNormals()
 		{
-			normals.clear(); // Clear any existing normals
+			normals.clear();
 
-			// Loop through the triangles and calculate normals
 			for (size_t i = 0; i < indices.size(); i += 3)
 			{
 				const Vector3& v0 = positions[indices[i]];
 				const Vector3& v1 = positions[indices[i + 1]];
 				const Vector3& v2 = positions[indices[i + 2]];
 
-				// Calculate the normal for this triangle
 				Vector3 edge1 = v1 - v0;
 				Vector3 edge2 = v2 - v0;
 				Vector3 normal = Vector3::Cross(edge1, edge2).Normalized();
 
-				// Assign the same normal to all vertices of the triangle
 				normals.push_back(normal);
 			}
 		}
 
 		void UpdateTransforms()
 		{
-			// Calculate the final transformation matrix
 			Matrix finalTransform = rotationTransform * scaleTransform * translationTransform;
 
-			// Clear any existing transformed positions and normals
 			transformedPositions.clear();
 			transformedNormals.clear();
 
-			// Apply the final transform to each position and normal
-			for (const Vector3& position : positions)
+			transformedPositions.reserve(positions.size());
+			transformedNormals.reserve(positions.size());
+
+			for (int i{}; i < positions.size(); ++i)
 			{
-				// Apply the transformation to the position
-				Vector3 transformedPosition = finalTransform.TransformPoint(position);
-				transformedPositions.push_back(transformedPosition);
+				Vector3 transformedPosition = finalTransform.TransformPoint(positions[i]);
+				transformedPositions.emplace_back(transformedPosition);
 			}
 
-			for (const Vector3& normal : normals)
+			for (int i{}; i < normals.size(); ++i)
 			{
-				// Apply the rotation part of the transformation to the normal
-				Vector3 transformedNormal = rotationTransform.TransformVector(normal);
-				transformedNormals.push_back(transformedNormal);
+				Vector3 transformedNormal = rotationTransform.TransformVector(normals[i]);
+				transformedNormals.emplace_back(transformedNormal);
 			}
 
 			UpdateTransformedAABB(finalTransform);
