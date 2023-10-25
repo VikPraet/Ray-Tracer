@@ -123,6 +123,11 @@ namespace dae
 			scaleTransform = Matrix::CreateScale(scale);
 		}
 
+		void Scale(const float scale)
+		{
+			scaleTransform = Matrix::CreateScale({scale,scale,scale});
+		}
+
 		void AppendTriangle(const Triangle& triangle, bool ignoreTransformUpdate = false)
 		{
 			int startIndex = static_cast<int>(positions.size());

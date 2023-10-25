@@ -41,10 +41,10 @@ namespace dae
 			float b{ Vector3::Dot((ray.direction), (ray.origin - sphere.origin)) };
 			float c{ Vector3::Dot((ray.origin - sphere.origin), ((ray.origin - sphere.origin))) - (sphere.radius * sphere.radius) };
 
-			float d = (b * b) - (c);
+			float d{ (b * b) - (c) };
 			if (d <= 0) return false;
 
-			float t = (-b - sqrt(d));
+			float t{ (-b - sqrt(d)) };
 			if(t < ray.min) t = (-b + sqrt(d));
 			if (t < ray.min || t > ray.max) return false;
 

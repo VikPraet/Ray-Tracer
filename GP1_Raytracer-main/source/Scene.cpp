@@ -379,9 +379,8 @@ namespace dae {
 			m_TriangleMeshGeometries[0].indices
 		);
 
-
 		m_TriangleMeshGeometries[0].Translate({ 0.f, 0.f, 0.f });
-		m_TriangleMeshGeometries[0].Scale({ 2.f, 2.f, 2.f });
+		m_TriangleMeshGeometries[0].Scale(2.f);
 
 		m_TriangleMeshGeometries[0].UpdateAABB();
 		m_TriangleMeshGeometries[0].UpdateTransforms();
@@ -394,7 +393,7 @@ namespace dae {
 	{
 		Scene::Update(pTimer);
 
-		const float rotationAngle{ cos(pTimer->GetTotal() + 1) / 2.f * PI_2 };
+		const float rotationAngle{ (cos(pTimer->GetTotal() + 1) / 2.f * PI_2) + PI };
 		for (int idx{}; idx < m_TriangleMeshGeometries.size(); ++idx)
 		{
 			m_TriangleMeshGeometries[idx].Rotate(0, rotationAngle, 0);
