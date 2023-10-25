@@ -166,7 +166,7 @@ namespace dae
 			transformedNormals.clear();
 
 			transformedPositions.reserve(positions.size());
-			transformedNormals.reserve(positions.size());
+			transformedNormals.reserve(normals.size());
 
 			for (int i{}; i < positions.size(); ++i)
 			{
