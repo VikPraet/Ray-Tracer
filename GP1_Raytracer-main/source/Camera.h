@@ -60,23 +60,19 @@ namespace dae
 			const float SPEED{7};
 			if (pKeyboardState[SDL_SCANCODE_W])
 			{
-				origin.x += forward.x *  SPEED * deltaTime;
-				origin.z += forward.z *  SPEED * deltaTime;
+				origin += forward *  SPEED * deltaTime;
 			}
 			if (pKeyboardState[SDL_SCANCODE_S])
 			{
-				origin.x -= forward.x * SPEED * deltaTime;
-				origin.z -= forward.z * SPEED * deltaTime;
+				origin -= forward * SPEED * deltaTime;
 			}
 			if (pKeyboardState[SDL_SCANCODE_A])
 			{
-				origin.x -= right.x * SPEED * deltaTime;
-				origin.z -= right.z * SPEED * deltaTime;
+				origin -= right * SPEED * deltaTime;
 			}
 			if (pKeyboardState[SDL_SCANCODE_D])
 			{
-				origin.x += right.x * SPEED * deltaTime;
-				origin.z += right.z * SPEED * deltaTime;
+				origin += right * SPEED * deltaTime;
 			}
 			if (pKeyboardState[SDL_SCANCODE_Q])
 			{
