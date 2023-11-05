@@ -106,13 +106,27 @@ namespace dae
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
+			const float SENSITIVITY{ 0.007f };
+			const float MOVEMENT_SENSITIVITY{ 0.07f };
 
 			if (mouseState & SDL_BUTTON_RMASK)
 			{
-				const float SENSITIVITY{ 0.007f };
 				totalPitch += mouseX * SENSITIVITY;
 				totalYaw -= mouseY * SENSITIVITY;
 				Matrix final{ Matrix::CreateRotationX(totalYaw) * Matrix::CreateRotationY(totalPitch) };
+
+				forward = final.TransformVector(Vector3::UnitZ);
+				forward.Normalize();
+			}
+
+			if (mouseState & SDL_BUTTON_LMASK)
+			{
+				totalPitch += mouseX * SENSITIVITY;
+				float movement = mouseY * MOVEMENT_SENSITIVITY;
+				Matrix final{ Matrix::CreateRotationX(totalYaw) * Matrix::CreateRotationY(totalPitch) };
+
+				origin.x += forward.x * -movement;
+				origin.z += forward.z * -movement;
 
 				forward = final.TransformVector(Vector3::UnitZ);
 				forward.Normalize();
