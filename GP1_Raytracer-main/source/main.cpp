@@ -77,6 +77,21 @@ int main(int argc, char* args[])
 					pRenderer->ToggleShadows();
 				if (e.key.keysym.scancode == SDL_SCANCODE_F3)
 					pRenderer->CycleLigntingMode();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+					pTimer->StartBenchmark();
+				break;
+			case SDL_MOUSEWHEEL:
+				float fovIncrement{ 3 };
+				if (e.wheel.y > 0)
+				{
+					pScene->GetCamera().fovAngle -= fovIncrement;
+					pScene->GetCamera().fovValue = tanf(pScene->GetCamera().fovAngle * TO_RADIANS / 2.f);
+				}
+				if (e.wheel.y < 0)
+				{
+					pScene->GetCamera().fovAngle += fovIncrement;
+					pScene->GetCamera().fovValue = tanf(pScene->GetCamera().fovAngle * TO_RADIANS / 2.f);
+				}
 				break;
 			}
 		}

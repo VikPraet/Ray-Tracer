@@ -120,23 +120,22 @@ namespace dae
 				break;
 			}
 
-
 			float t{ Vector3::Dot((triangle.v0 - ray.origin), triangle.normal) / (Vector3::Dot(ray.direction, triangle.normal)) };
 			if (t < ray.min || t > ray.max) return false;
 
 			Vector3 point{ ray.origin + ray.direction * t };
 
-			// vertiex 1
+			// vertex 1
 			e = triangle.v1 - triangle.v0;
 			p = point - triangle.v0;
 			if (Vector3::Dot(Vector3::Cross(e, p), triangle.normal) < 0) return false;
 
-			// vertiex 2
+			// vertex 2
 			e = triangle.v2 - triangle.v1;
 			p = point - triangle.v1;
 			if (Vector3::Dot(Vector3::Cross(e, p), triangle.normal) < 0) return false;
 
-			// vertiex 3
+			// vertex 3
 			e = triangle.v0 - triangle.v2;
 			p = point - triangle.v2;
 			if (Vector3::Dot(Vector3::Cross(e, p), triangle.normal) < 0) return false;
@@ -164,15 +163,15 @@ namespace dae
 			////todo W5
 			if (!Slabtest_TrianglMesh(mesh, ray)) return false;
 
-			bool hitSomething{ false };
+			bool hasHitSomething{ false };
 			HitRecord temp{};
 			float distance = FLT_MAX;
 
-			for (int idx{}; idx < mesh.indices.size(); idx += 3)
+			for (int i{}; i < mesh.indices.size(); i += 3)
 			{
-				const Vector3& v0 = mesh.transformedPositions[mesh.indices[idx]];
-				const Vector3& v1 = mesh.transformedPositions[mesh.indices[idx + 1]];
-				const Vector3& v2 = mesh.transformedPositions[mesh.indices[idx + 2]];
+				const Vector3& v0{ mesh.transformedPositions[mesh.indices[i]]     };
+				const Vector3& v1{ mesh.transformedPositions[mesh.indices[i + 1]] };
+				const Vector3& v2{ mesh.transformedPositions[mesh.indices[i + 2]] };
 
 				const Vector3 edge1{ v1 - v0 };
 				const Vector3 edge2{ v2 - v0 };
@@ -181,28 +180,23 @@ namespace dae
 				const float a{ Vector3::Dot(edge1, h) };
 
 				if (a < -FLT_EPSILON && mesh.cullMode == TriangleCullMode::BackFaceCulling) continue;
-
 				if (a > FLT_EPSILON && mesh.cullMode == TriangleCullMode::FrontFaceCulling) continue;
-
 
 				const float f{ 1.0f / a };
 				const Vector3 s{ ray.origin - v0 };
 				const float u{ f * Vector3::Dot(s, h) };
-
 				if (u < 0.0 || u > 1.0) continue;
 
 				const Vector3 q{ Vector3::Cross(s, edge1) };
 				const float v{ f * Vector3::Dot(ray.direction, q) };
-
 				if (v < 0.0 || u + v > 1.0) continue;
 
 				const float t{ f * Vector3::Dot(edge2, q) };
-
 				if (t > ray.max || t < ray.min) continue;
 
 				if (t < distance)
 				{
-					hitSomething = true;
+					hasHitSomething = true;
 					distance = t;
 					if (!ignoreHitRecord)
 					{
@@ -214,7 +208,7 @@ namespace dae
 					}
 				}
 			}
-			return hitSomething;
+			return hasHitSomething;
 		}
 
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray)

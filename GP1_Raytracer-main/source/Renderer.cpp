@@ -11,6 +11,11 @@
 #include "Utils.h"
 
 #include <execution>
+#include<Windows.h>
+
+#ifdef max
+#undef max
+#endif
 
 #define PARALLEL_EXECUTION
 
@@ -44,7 +49,7 @@ void Renderer::Render(Scene* pScene) const
 	for (uint32_t idx{}; idx < amountOfPixels; ++idx) pixelIndices.emplace_back(idx);
 	{
 		std::for_each(std::execution::par, pixelIndices.begin(), pixelIndices.end(), [&](int i) {
-			RenderPixel(pScene, i, camera.fovValue, aspectRatio, cameraToWorld, camera.origin, camera, materials, lights);
+			RenderPixel(pScene, i, camera.fovValue, aspectRatio, cameraToWorld, camera.origin, materials, lights);
 			});
 	}
 
@@ -62,7 +67,7 @@ void Renderer::Render(Scene* pScene) const
 	SDL_UpdateWindowSurface(m_pWindow);
 }
 
-void dae::Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld, const Vector3 camerOrigin, Camera& camera, std::vector<dae::Material*>& materials, std::vector<dae::Light>& lights) const
+void dae::Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld, const Vector3 camerOrigin, std::vector<dae::Material*>& materials, std::vector<dae::Light>& lights) const
 {
 	const uint32_t px{ pixelIndex % m_Width }, py{ pixelIndex / m_Width };
 
@@ -71,7 +76,7 @@ void dae::Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, f
 	float cy{ (1 - (2 * (ry / float(m_Height)))) * fov };
 
 
-	Ray viewRay{ camera.origin };
+	Ray viewRay{ camerOrigin };
 	Vector3 rayDirection{cx, cy, 1 };
 
 	viewRay.direction = cameraToWorld.TransformVector(rayDirection.Normalized());
@@ -142,12 +147,47 @@ bool Renderer::SaveBufferToImage() const
 
 void dae::Renderer::CycleLigntingMode()
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 0x0c);
+
 	m_CurrentLightingMode = static_cast<LightingMode>(int(m_CurrentLightingMode) + 1);
 	if (int(m_CurrentLightingMode) > 3)
 		m_CurrentLightingMode = LightingMode::ObservedArea;
+
+	std::cout << "LigtingMode ";
+
+	switch (m_CurrentLightingMode)
+	{
+	case dae::Renderer::LightingMode::ObservedArea:
+		std::cout << "ObservedArea";
+		break;
+
+	case dae::Renderer::LightingMode::Radiance:
+		std::cout << "Radiance";
+		break;
+
+	case dae::Renderer::LightingMode::BDRF:
+		std::cout << "BDRF";
+		break;
+
+	case dae::Renderer::LightingMode::Combined:
+		std::cout << "Combined";
+		break;
+	}
+
+	std::cout << std::endl;
+
+	SetConsoleTextAttribute(hConsole, 0x07);
 }
 
 void dae::Renderer::ToggleShadows()
 {
 	m_ShadowsEnabled = !m_ShadowsEnabled;
+
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 0x0c);
+
+	std::cout <<  "Shadows " << std::boolalpha << m_ShadowsEnabled << std::endl;
+
+	SetConsoleTextAttribute(hConsole, 0x07);
 }

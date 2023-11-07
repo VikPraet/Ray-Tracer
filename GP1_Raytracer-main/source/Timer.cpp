@@ -2,9 +2,16 @@
 
 #include <iostream>
 #include <numeric>
-
-#include <iostream>
 #include <fstream>
+#include<Windows.h>
+
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
 
 #include "SDL.h"
 using namespace dae;
@@ -43,9 +50,13 @@ void Timer::Start()
 
 void Timer::StartBenchmark(int numFrames)
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 0x0c);
+
 	if (m_BenchmarkActive)
 	{
-		std::cout << "(Benchmark already running)";
+		std::cout << "(Benchmark already running)" << std::endl;
+		SetConsoleTextAttribute(hConsole, 0x07);
 		return;
 	}
 
@@ -62,6 +73,8 @@ void Timer::StartBenchmark(int numFrames)
 	m_Benchmarks.resize(m_BenchmarkFrames);
 
 	std::cout << "**BENCHMARK STARTED**\n";
+
+	SetConsoleTextAttribute(hConsole, 0x07);
 }
 
 void Timer::Update()
@@ -110,13 +123,19 @@ void Timer::Update()
 			++m_BenchmarkCurrFrame;
 			if (m_BenchmarkCurrFrame >= m_BenchmarkFrames)
 			{
+				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+				SetConsoleTextAttribute(hConsole, 0x0c);
+
 				m_BenchmarkActive = false;
 				m_BenchmarkAvg = std::accumulate(m_Benchmarks.begin(), m_Benchmarks.end(), 0.f) / float(m_BenchmarkFrames);
 
 				//print
 				std::cout << "**BENCHMARK FINISHED**\n";
+				SetConsoleTextAttribute(hConsole, 0x0a);
 				std::cout << ">> HIGH = " << m_BenchmarkHigh << std::endl;
+				SetConsoleTextAttribute(hConsole, 0x04);
 				std::cout << ">> LOW = " << m_BenchmarkLow << std::endl;
+				SetConsoleTextAttribute(hConsole, 0x0e);
 				std::cout << ">> AVG = " << m_BenchmarkAvg << std::endl;
 
 				//file save
@@ -126,6 +145,8 @@ void Timer::Update()
 				fileStream << "LOW = " << m_BenchmarkLow << std::endl;
 				fileStream << "AVG = " << m_BenchmarkAvg << std::endl;
 				fileStream.close();
+
+				SetConsoleTextAttribute(hConsole, 0x07);
 			}
 		}
 	}

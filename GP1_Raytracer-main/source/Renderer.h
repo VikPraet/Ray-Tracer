@@ -25,7 +25,7 @@ namespace dae
 		Renderer& operator=(Renderer&&) noexcept = delete;
 
 		void Render(Scene* pScene) const;
-		void RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld, const Vector3 camerOrigin, Camera& camera, std::vector<dae::Material*>& materials, std::vector<dae::Light>& lights) const;
+		void RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld, const Vector3 camerOrigin, std::vector<dae::Material*>& materials, std::vector<dae::Light>& lights) const;
 		bool SaveBufferToImage() const;
 
 		void CycleLigntingMode();

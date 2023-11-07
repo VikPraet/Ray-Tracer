@@ -57,6 +57,7 @@ namespace dae
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
+			// movement
 			const float SPEED{7};
 			if (pKeyboardState[SDL_SCANCODE_W])
 			{
@@ -83,9 +84,9 @@ namespace dae
 				origin.y -= up.y * SPEED * deltaTime;
 			}
 
-
+			// fov
 			const float FOV_INCREMENT	{ 20 };
-			const int MAX_FOV			{ 179 };
+			const int MAX_FOV			{ 160 };
 			const int MIN_FOV			{ 10 };
 
 			if (pKeyboardState[SDL_SCANCODE_DOWN] && fovAngle < MAX_FOV)
@@ -99,13 +100,29 @@ namespace dae
 				fovValue = tanf(fovAngle * TO_RADIANS / 2.f);
 			}
 
+			if (fovAngle > MAX_FOV)
+			{
+				fovAngle = MAX_FOV;
+				fovValue = tanf(fovAngle * TO_RADIANS / 2.f);
+			}
+			if (fovAngle < MIN_FOV)
+			{
+				fovAngle = MIN_FOV;
+				fovValue = tanf(fovAngle * TO_RADIANS / 2.f);
+			}
+
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 			const float SENSITIVITY{ 0.007f };
 			const float MOVEMENT_SENSITIVITY{ 0.07f };
 
-			if (mouseState & SDL_BUTTON_RMASK)
+			if (mouseState & SDL_BUTTON_LMASK && mouseState & SDL_BUTTON_RMASK)
+			{
+				float movement = mouseY * MOVEMENT_SENSITIVITY;
+				origin.y -= up.y * movement;
+			}
+			else if (mouseState & SDL_BUTTON_RMASK)
 			{
 				totalPitch += mouseX * SENSITIVITY;
 				totalYaw -= mouseY * SENSITIVITY;
@@ -114,8 +131,7 @@ namespace dae
 				forward = final.TransformVector(Vector3::UnitZ);
 				forward.Normalize();
 			}
-
-			if (mouseState & SDL_BUTTON_LMASK)
+			else if (mouseState & SDL_BUTTON_LMASK)
 			{
 				totalPitch += mouseX * SENSITIVITY;
 				float movement = mouseY * MOVEMENT_SENSITIVITY;
